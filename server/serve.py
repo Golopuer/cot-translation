@@ -18,11 +18,10 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import torch
 
-MODEL_DIR = os.environ.get("QWEN_LOCAL_MODEL_DIR", "./models/Qwen3.5-0.8B")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_DIR = os.environ.get("QWEN_LOCAL_MODEL_DIR", os.path.join(BASE_DIR, "models", "Qwen3.5-0.8B"))
 HOST = os.environ.get("QWEN_LOCAL_HOST", "127.0.0.1")
 PORT = int(os.environ.get("QWEN_LOCAL_PORT", "7860"))
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 _state = {
     "model": None,
