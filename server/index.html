@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>cot-translate · 思维链人话翻译</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    background: #0b0f14; color: #e6edf3;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  header {
+    height: 48px; flex: 0 0 48px; display: flex; align-items: center; gap: 12px;
+    padding: 0 16px; background: #161b22; border-bottom: 1px solid #30363d;
+  }
+  header h1 { font-size: 15px; margin: 0; font-weight: 600; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #3fb950; }
+  .dot.off { background: #f85149; }
+  .badge { font-size: 12px; color: #8b949e; }
+  main { flex: 1; display: flex; flex-direction: column; min-height: 0; padding: 14px 20px; gap: 12px; }
+  textarea {
+    width: 100%; background: #0b0f14; color: #e6edf3; border: 1px solid #30363d;
+    border-radius: 6px; padding: 8px 10px; font-size: 13px; font-family: inherit; resize: vertical;
+  }
+  textarea:focus { outline: none; border-color: #1f6feb; }
+  .row { display: flex; gap: 10px; align-items: center; }
+  button {
+    padding: 7px 14px; border: none; border-radius: 7px; cursor: pointer;
+    background: #1f6feb; color: #fff; font-size: 13px; font-family: inherit;
+  }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  button.ghost { background: transparent; border: 1px solid #30363d; color: #8b949e; }
+  .hint { font-size: 11px; color: #484f58; }
+  .out {
+    flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+    border: 1px solid #30363d; border-radius: 10px; padding: 14px; background: #161b22;
+  }
+  .msg { max-width: 100%; padding: 9px 12px; border-radius: 10px; font-size: 13px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+  .msg.result { align-self: flex-start; background: #21262d; color: #e6edf3; }
+  .msg.status { align-self: center; font-size: 11px; color: #8b949e; background: transparent; border: none; }
+  .msg.err { align-self: flex-start; background: #2a1520; color: #fca5a5; }
+</style>
+</head>
+<body>
+  <header>
+    <span class="dot" id="dot"></span>
+    <h1>cot-translate · 思维链人话翻译</h1>
+    <span class="badge" id="status">检查服务…</span>
+  </header>
+  <main>
+    <textarea id="src" rows="6" placeholder="粘贴要翻译/概括的英文思考（思维链）…"></textarea>
+    <div class="row">
+      <button id="goBtn">翻译 / 概括</button>
+      <button id="clearBtn" class="ghost">清空</button>
+      <span class="hint">Ctrl+Enter 翻译 · 全程本地，不调用云端</span>
+    </div>
+    <div class="out" id="translateOut"><span class="msg status">译文将显示在这里</span></div>
+  </main>
+<script>
+const $ = (id) => document.getElementById(id);
+const API = '';
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function ping() {
+  try {
+    const r = await fetch(API + '/health');
+    const j = await r.json();
+    $('dot').className = 'dot' + (j.ok ? '' : ' off');
+    $('status').textContent = j.ok ? ('已就绪 · ' + (j.device || '')) : '模型加载中…';
+  } catch (e) {
+    $('dot').className = 'dot off';
+    $('status').textContent = '服务未连接';
+  }
+}
+
+function setOut(html) { $('translateOut').innerHTML = html; }
+
+$('goBtn').addEventListener('click', doTranslate);
+$('src').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) doTranslate();
+});
+$('clearBtn').addEventListener('click', () => {
+  $('src').value = '';
+  setOut('<span class="msg status">译文将显示在这里</span>');
+});
+
+async function doTranslate() {
+  const text = $('src').value.trim();
+  if (!text) return;
+  $('goBtn').disabled = true;
+  setOut('<span class="msg status">翻译中…</span>');
+  try {
+    const r = await fetch(API + '/v1/translate', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+    const j = await r.json();
+    if (j.ok) {
+      setOut('<div class="msg result">' + escapeHtml(j.text) + '</div>');
+    } else {
+      setOut('<div class="msg err">错误：' + escapeHtml(j.error || '') + '</div>');
+    }
+  } catch (e) {
+    setOut('<div class="msg err">请求失败：' + escapeHtml(String(e)) + '</div>');
+  } finally {
+    $('goBtn').disabled = false;
+  }
+}
+
+ping();
+setInterval(ping, 5000);
+</script>
+</body>
+</html>
