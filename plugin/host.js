@@ -8,7 +8,7 @@
  * 职责：
  *   1. 纯监听 session/event（emit 事件，不碰 llm/stream 这条主模型流）
  *   2. 收集 assistant/chunk 的 reasoning-delta，按「大块」切段
- *   3. 只翻译英文思考（中文跳过），调本地 qwen-local 服务
+ *   3. 只翻译英文思考（中文跳过），调本地翻译服务（server/serve.py）
  *   4. 译文按会话隔离、带轮次/步骤、写历史（E盘）
  */
 return {
