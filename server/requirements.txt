@@ -1,0 +1,8 @@
+# Python 运行时依赖（参考）
+# 本项目仅需 torch + transformers，其余为传递依赖。
+# 安装（建议在独立 venv 中）：
+#   pip install torch transformers
+# 注意：Qwen3.5-0.8B 需要较新的 transformers（>=5.x 能识别 qwen3_5 架构）。
+
+torch>=2.0
+transformers>=5.0
