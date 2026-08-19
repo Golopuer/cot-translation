@@ -24,7 +24,7 @@
 DSH 插件 Host 半：收集 reasoning → 切段 → 只翻英文 → 调本地服务
         │  HTTP POST /v1/translate（127.0.0.1:7860）
         ▼
-本地推理服务（qwen-local）：Qwen3.5-0.8B on GPU，概括成中文
+本地推理服务（本仓库 server/serve.py）：Qwen3.5-0.8B on GPU，概括成中文
         │  host.call 轮询
         ▼
 DSH 插件 Client 半：右侧窄面板，彩色步骤标注 + 回到底部
@@ -74,7 +74,7 @@ python serve.py
 
 | 变量 | 默认值 | 说明 |
 |---|---|---|
-| `QWEN_LOCAL_MODEL_DIR` | `./models/Qwen3.5-0.8B` | 模型目录 |
+| `QWEN_LOCAL_MODEL_DIR` | `server/models/Qwen3.5-0.8B` | 模型目录 |
 | `QWEN_LOCAL_HOST` | `127.0.0.1` | 监听地址 |
 | `QWEN_LOCAL_PORT` | `7860` | 监听端口 |
 
