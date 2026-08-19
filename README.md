@@ -59,7 +59,7 @@ git lfs install
 git clone https://huggingface.co/Qwen/Qwen3.5-0.8B server/models/Qwen3.5-0.8B
 ```
 
-> 注：若 HuggingFace 上不存在 `Qwen/Qwen3.5-0.8B` 公开仓库，可用任意 Qwen 系列小模型替代（≥0.5B），放到 `server/models/` 并相应调整 `MODEL_DIR` 与 `TRANSLATE_SYSTEM` 提示词。
+> 如需替换为其他 Qwen 系列小模型：把权重放到 `server/models/`，并相应调整 `MODEL_DIR` 与 `TRANSLATE_SYSTEM` 提示词。
 
 ### 2. 安装依赖并启动本地服务
 
